@@ -1,4 +1,5 @@
 import sys
+import os
 import json
 from typing import List, TypedDict
 
@@ -20,8 +21,6 @@ CONFIG_FILE = "amm.json"
 
 
 def init(args: List[str]) -> None:
-    print("Init", args)
-
     config = Config(
         amm_version='0.1.0',
         name="Something",
@@ -30,8 +29,13 @@ def init(args: List[str]) -> None:
     )
 
     json_text = json.dumps(config, indent=4)
-    with open(CONFIG_FILE, 'w') as file:
-        file.write(json_text)
+    if os.path.isfile(CONFIG_FILE):
+        print("{} exists. skipping...".format(CONFIG_FILE))
+    else:
+        with open(CONFIG_FILE, 'w') as file:
+            file.write(json_text)
+            print("{} saved".format(CONFIG_FILE))
+            print(json_text)
 
 
 def main() -> None:

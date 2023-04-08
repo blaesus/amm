@@ -15,28 +15,22 @@ def parse_link_header(s: str) -> Tuple[str, str]:
 page = 1
 url = 'https://huggingface.co/api/models?limit=10000&full=true&sort=downloads&direction=-1'
 
-page = 12
-url = 'https://huggingface.co/api/models?limit=10000&full=true&sort=downloads&direction=-1&cursor=eyIkb3IiOlt7ImRvd25sb2FkcyI6MCwiX2lkIjp7IiRndCI6IjYyYTA0ZTQxZmM5ZmI5MDQ4ZTlhMGM5ZSJ9fSx7ImRvd25sb2FkcyI6eyIkbHQiOjB9fSx7ImRvd25sb2FkcyI6bnVsbH1dfQ%3D%3D'
-
 while True:
     print("Getting {}".format(url))
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = json.loads(response.text)
-            with open('model-indices/{}.json'.format(page), 'w') as outfile:
-                json.dump(data, outfile, indent=4)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        with open('model-indices/{}.json'.format(page), 'w') as outfile:
+            json.dump(data, outfile, indent=4)
 
-        else:
-            print(f"Error: {response.status_code}")
+    else:
+        print(f"Error: {response.status_code}")
 
-        (link, relation) = parse_link_header(response.headers["Link"])
-        if relation == "next":
-            url = link
-        else:
-            break
+    (link, relation) = parse_link_header(response.headers["Link"])
+    if relation == "next":
+        url = link
+    else:
+        break
 
-        page += 1
-    except:
-        print("error")
-    time.sleep(300)
+    page += 1
+time.sleep(300)

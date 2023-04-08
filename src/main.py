@@ -53,8 +53,13 @@ def is_model(name: str) -> bool:
 
 
 def probe(args: List[str]) -> None:
+
+    search_root = "."
+    if len(args) >= 1:
+        search_root = args[0]
+
     model_paths: List[str] = []
-    for (base, subdirectories, filenames) in os.walk("."):
+    for (base, subdirectories, filenames) in os.walk(search_root):
         for name in filenames:
             if is_model(name):
                 model_paths.append(os.path.join(base, name))

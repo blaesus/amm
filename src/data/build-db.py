@@ -7,12 +7,12 @@ conn = sqlite3.connect('amm.db')
 c = conn.cursor()
 
 # Reset sqlite table
-c.execute('DROP TABLE IF EXISTS checkpoint_sets')
+c.execute('DROP TABLE IF EXISTS repos')
 c.execute('DROP TABLE IF EXISTS checkpoints')
 c.execute('DROP TABLE IF EXISTS file_records')
 
 # Create the table if it doesn't exist
-c.execute('''CREATE TABLE IF NOT EXISTS checkpoint_sets
+c.execute('''CREATE TABLE IF NOT EXISTS repos
              (id INTEGER PRIMARY KEY AUTOINCREMENT,
               registry TEXT,
               registryId TEXT,
@@ -44,7 +44,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS file_records (
 
 
 
-# Read each JSON file in the directory
+# handle civitai
 dir_path = 'civitai/model-indices'
 for filename in os.listdir(dir_path):
     if filename.endswith('.json'):
@@ -53,7 +53,7 @@ for filename in os.listdir(dir_path):
             for item in data["items"]:
                 c.execute(
                     '''
-                    INSERT INTO checkpoint_sets (
+                    INSERT INTO repos (
                         registry,
                         registryId,
                         subtype,
@@ -104,6 +104,68 @@ for filename in os.listdir(dir_path):
                         )
 
                 conn.commit()
+
+# handle huggingface
+dir_path = 'huggingface/model-indices'
+for filename in os.listdir(dir_path):
+    if filename.endswith('.json'):
+        with open(os.path.join(dir_path, filename), 'r') as f:
+            data = json.load(f)
+            for item in data:
+                c.execute(
+                    '''
+                    INSERT INTO repos (
+                        registry,
+                        registryId,
+                        subtype,
+                        latestDownload,
+                        name,
+                        data
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                    ''',
+                    (
+                        "huggingface",
+                        str(item["id"]),
+                        item.get("pipeline_tag", ""),
+                        item["downloads"],
+                        item["id"],
+                        json.dumps(item)
+                    )
+                )
+                c.execute(
+                    '''
+                    INSERT INTO checkpoints (
+                        setId,
+                        data
+                    ) VALUES (?, ?)
+                    ''',
+                    (
+                        c.lastrowid,
+                        json.dumps({
+                            "sha": item["sha"],
+                        })
+                    )
+                )
+
+                files = item.get("siblings", [])
+                for file in files:
+                    c.execute(
+                        '''
+                        INSERT INTO file_records (
+                            checkpointId,
+                            filename,
+                            url
+                        ) VALUES (?, ?, ?)
+                        ''',
+                        (
+                            c.lastrowid,
+                            file["rfilename"],
+                            ""
+                        )
+                    )
+
+                conn.commit()
+
 
 # Close the SQLite connection
 conn.close()

@@ -2,4 +2,4 @@
 .DS_Store
 localtest
 
-src/civitai/model-indices
+model-indices

@@ -135,7 +135,7 @@ for filename in os.listdir(dir_path):
                 c.execute(
                     '''
                     INSERT INTO checkpoints (
-                        setId,
+                        repoId,
                         data
                     ) VALUES (?, ?)
                     ''',

@@ -86,6 +86,7 @@ for filename in os.listdir(dir_path):
                         )
                     )
 
+                    checkpointId = c.lastrowid
                     files = checkpoint["files"]
                     for file in files:
                         c.execute(
@@ -97,7 +98,7 @@ for filename in os.listdir(dir_path):
                             ) VALUES (?, ?, ?)
                             ''',
                             (
-                                c.lastrowid,
+                                checkpointId,
                                 file["name"],
                                 file["downloadUrl"]
                             )

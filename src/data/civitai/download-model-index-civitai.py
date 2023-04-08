@@ -1,5 +1,6 @@
 import requests
 import json
+imoprt time
 
 page = 40
 pagesize=100
@@ -18,3 +19,4 @@ while True:
         print(f"Error: {response.status_code}")
 
     page += 1
+    time.sleep(10)

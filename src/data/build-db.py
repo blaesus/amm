@@ -27,7 +27,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS repos
 c.execute('''CREATE TABLE IF NOT EXISTS checkpoints
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    setId TEXT,
+    repoId TEXT,
     data TEXT
 )
 ''')
@@ -76,7 +76,7 @@ for filename in os.listdir(dir_path):
                     c.execute(
                         '''
                         INSERT INTO checkpoints (
-                            setId,
+                            repoId,
                             data
                         ) VALUES (?, ?)
                         ''',
@@ -146,6 +146,7 @@ for filename in os.listdir(dir_path):
                         })
                     )
                 )
+                checkpoint_id = c.lastrowid
 
                 files = item.get("siblings", [])
                 for file in files:
@@ -158,7 +159,7 @@ for filename in os.listdir(dir_path):
                         ) VALUES (?, ?, ?)
                         ''',
                         (
-                            c.lastrowid,
+                            checkpoint_id,
                             file["rfilename"],
                             ""
                         )

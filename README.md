@@ -4,7 +4,11 @@ The AI model manager.
 
 ```sh
 
+# Initialize a new directory
 amm init
+
+# Probe an existing directory to build a map
+amm probe
 
 amm install https://civitai.com/models/7240/meinamix
 

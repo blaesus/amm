@@ -1,7 +1,7 @@
 import sys
 import os
 import json
-from typing import List, TypedDict
+from typing import List, TypedDict, Tuple
 
 
 class DependencyItem(TypedDict):
@@ -38,10 +38,36 @@ def init(args: List[str]) -> None:
             print(json_text)
 
 
+MODEL_SUFFICES = [
+    "safetensors",
+    "ckpt",
+    "bin",
+    "pth",
+]
+
+def is_model(name: str) -> bool:
+    for suffix in MODEL_SUFFICES:
+        if name.endswith(suffix):
+            return True
+    return False
+
+
+def probe(args: List[str]) -> None:
+    model_paths: List[str] = []
+    for (base, subdirectories, filenames) in os.walk("."):
+        for name in filenames:
+            if is_model(name):
+                model_paths.append(os.path.join(base, name))
+
+    print(model_paths)
+
+
 def main() -> None:
     verb = sys.argv[1]
     if verb == "init":
         init(sys.argv[2:])
+    elif verb == "probe":
+        probe(sys.argv[2:])
     else:
         print("Unknown verb", verb)
 

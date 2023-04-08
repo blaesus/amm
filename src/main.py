@@ -8,12 +8,12 @@ class DependencyItem(TypedDict):
     name: str
     url: str
     version: str
+    root: str
 
 
 class Config(TypedDict):
     amm_version: str
     name: str
-    root: str
     items: List[DependencyItem]
 
 

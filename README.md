@@ -17,4 +17,9 @@ amm install https://huggingface.co/THUDM/chatglm-6b/blob/main/pytorch_model-0000
 
 amm install bloom
 
+# Assuming amm.json is available
+amm install
+
+amm install -r non-default-named.amm.json
+
 ```

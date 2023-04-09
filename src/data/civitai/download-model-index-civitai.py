@@ -1,9 +1,10 @@
-import requests
+import time
 import json
-imoprt time
+
+import requests
 
 page = 40
-pagesize=100
+pagesize = 100
 
 while True:
     url = 'https://civitai.com/api/v1/models?page={}&limit={}'.format(page, pagesize)

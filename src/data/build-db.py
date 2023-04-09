@@ -43,7 +43,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS file_records (
 ''')
 
 # handle civitai
-dir_path = 'civitai/model-indices'
+dir_path = 'civitai/model-indices-20230408'
 for filename in os.listdir(dir_path):
     if filename.endswith('.json'):
         with open(os.path.join(dir_path, filename), 'r') as f:

@@ -3,5 +3,6 @@
 localtest
 
 model-indices
+model-indices*
 amm.db
 src/data/snapshots/*

@@ -89,6 +89,7 @@ def probe(args: List[str]) -> None:
         rows = c.fetchall()
         # TODO: handle multiple results
         relative_path = os.path.relpath(base, search_root)
+        print([tuple(row) for row in rows])
         if len(rows) >= 1:
             row = rows[0]
             dependencies.append({

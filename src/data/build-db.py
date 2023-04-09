@@ -42,8 +42,6 @@ c.execute('''CREATE TABLE IF NOT EXISTS file_records (
     )
 ''')
 
-
-
 # handle civitai
 dir_path = 'civitai/model-indices'
 for filename in os.listdir(dir_path):
@@ -162,12 +160,13 @@ for filename in os.listdir(dir_path):
                         (
                             checkpoint_id,
                             file["rfilename"],
-                            ""
+                            # like this: https://huggingface.co/nitrosocke/Nitro-Diffusion/resolve/70e3387b971acebcc9ecd0f93e2ff5cdb9308b5c/nitroDiffusion-v1.ckpt
+                            "https://huggingface.co/{}/resolve/{}/{}".format(item['modelId'], item["sha"],
+                                                                             file["rfilename"])
                         )
                     )
 
                 conn.commit()
-
 
 # Close the SQLite connection
 conn.close()

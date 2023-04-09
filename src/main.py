@@ -88,13 +88,14 @@ def probe(args: List[str]) -> None:
         # print select result
         rows = c.fetchall()
         # TODO: handle multiple results
+        relative_path = os.path.relpath(base, search_root)
         if len(rows) >= 1:
             row = rows[0]
             dependencies.append({
                 "name": name,
                 "url": row["url"],
                 "version": "",
-                "root": base,
+                "root": relative_path,
             })
             print("best match: {}".format(row["url"]))
         else:
@@ -102,7 +103,7 @@ def probe(args: List[str]) -> None:
                 "name": name,
                 "url": "",
                 "version": "",
-                "root": base,
+                "root": relative_path,
             })
 
     config = ModuleConfig(

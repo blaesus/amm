@@ -12,17 +12,18 @@ class DependencyItem(TypedDict):
     root: str
 
 
-class Config(TypedDict):
+class ModuleConfig(TypedDict):
     amm_version: str
     name: str
     items: List[DependencyItem]
 
-
 CONFIG_FILE = "amm.json"
+
+DB_FILE = 'src/data/amm.db'
 
 
 def init(args: List[str]) -> None:
-    config = Config(
+    config = ModuleConfig(
         amm_version='0.1.0',
         name="Something",
         root=".",
@@ -46,6 +47,7 @@ MODEL_SUFFICES = [
     "pth",
 ]
 
+
 def is_model(name: str) -> bool:
     for suffix in MODEL_SUFFICES:
         if name.endswith(suffix):
@@ -54,12 +56,13 @@ def is_model(name: str) -> bool:
 
 
 def probe(args: List[str]) -> None:
-
-
     search_root = "."
     if len(args) >= 1:
         search_root = args[0]
 
+    db_file = DB_FILE
+    if len(args) >= 2:
+        db_file = args[1]
 
     model_paths: List[(str, str)] = []
     for (base, subdirectories, filenames) in os.walk(search_root):
@@ -67,24 +70,55 @@ def probe(args: List[str]) -> None:
             if is_model(name):
                 model_paths.append((base, name))
 
+    dependencies: List[DependencyItem] = []
 
-    conn = sqlite3.connect('src/data/amm.db')
+    conn = sqlite3.connect(db_file)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
+
     for (base, name) in model_paths:
         print("\nfitting file {}".format(name))
         c.execute("""
-        SELECT repos.id, repos.registry, repos.name, repos.latestDownload FROM file_records
+        SELECT repos.id, repos.registry, repos.name, repos.latestDownload, file_records.url FROM file_records
         JOIN checkpoints ON file_records.checkpointId = checkpoints.id
         JOIN repos ON repos.id = checkpoints.repoId
         WHERE file_records.filename LIKE '%{}%'
         ORDER BY repos.latestDownload DESC;
         """.format(name))
         # print select result
+        rows = c.fetchall()
+        # TODO: handle multiple results
+        if len(rows) >= 1:
+            row = rows[0]
+            dependencies.append({
+                "name": name,
+                "url": row["url"],
+                "version": "",
+                "root": base,
+            })
+            print("best match: {}".format(row["url"]))
+        else:
+            dependencies.append({
+                "name": name,
+                "url": "",
+                "version": "",
+                "root": base,
+            })
 
-        print(c.fetchall())
+    config = ModuleConfig(
+        amm_version='0.1.0',
+        name="Something",
+        root=".",
+        items=dependencies,
+    )
 
+    # save config to json
+    json_text = json.dumps(config, indent=4)
+    with open(CONFIG_FILE, 'w') as file:
+        file.write(json_text)
+        print("{} saved".format(CONFIG_FILE))
+        print(json_text)
 
-    print(model_paths)
 
 
 def main() -> None:

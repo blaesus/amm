@@ -1,3 +1,8 @@
 .idea
 .DS_Store
 localtest
+
+model-indices
+model-indices*
+amm.db
+src/data/snapshots/*

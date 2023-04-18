@@ -32,3 +32,6 @@ amm install
 amm install -r non-default-named.amm.json
 
 ```
+
+# License
+MIT
